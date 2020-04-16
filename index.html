@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="./main.css" />
+  </head>
+  <body>
+    <!--  -->
+    <div id="app" @mousemove="onDrag($event)" @mouseup="onDragStop()">
+      <main>
+        <div
+             v-for="(pane, paneIdx) in filledPanes"
+             :key="paneIdx"
+             :ref="`pane-${paneIdx}`"
+             class="pane"
+             >
+          <div class="pane-header">{{ pane.name }}</div>
+          <div
+               v-for="(card, cardIdx) in pane.cards"
+               :key="cardIdx"
+               :class="{ 'pane-card': true, 'dragging': draggedCardIdx === card.index }"
+               :ref="`card-${card.index}`"
+               @mousedown="onDragStart($event, card.index)"
+               >
+            {{ card.name }}
+          </div>
+        </div>
+        <span class="author">by <a href="https://lucasportet.com">@l-portet</a></span>
+      </main>
+      <div
+           id="ghost-card"
+           ref="ghostCard"
+           :style="`
+                   width: ${ghostCardStyle.width}px;
+                   left: ${ghostCardStyle.pos.x}px; top: ${ghostCardStyle.pos.y - 10}px;
+                   transform: ${ghostCardStyle.transform};
+                   transform-origin: ${ghostCardStyle.transformOrigin};
+                   `"
+           :class="{ 'pane-card': true, 'active': draggedCardIdx !== -1, leaving: ghostCardStyle.leaving, animate: settings.animate }"
+           >
+        {{ draggedCard.name }}
+      </div>
+      <div class="settings" :class="{expanded: settingsExpanded}" @click="expandSettings">
+        <h2>Settings <button v-show="settingsExpanded" @click.stop="wrapSettings">Close</button></h2>
+        <h3>Animation</h3>
+        <label>
+
+          Smooth
+          <input v-model="settings.smooth" type="checkbox">
+        </label>
+        <label>
+          Animate on end
+          <input v-model="settings.animateEnd" type="checkbox">
+        </label>
+        <h3>Transform</h3>
+        <label>
+          Origin
+          <select v-model="settings.transformOriginMode">
+            <option value="mouse">Mouse position</option>
+            <option value="center">Center</option>
+          </select>
+        </label>
+        <label>
+          Scale
+          <input v-model="settings.scale" type="number">
+        </label>
+        <h3>Rotation</h3>
+        <label>
+          Offset Min
+          <input v-model="settings.rotationOffset.min" type="number" :disabled="!settings.smooth">
+        </label>
+        <label>
+          Offset Max
+          <input v-model="settings.rotationOffset.max" type="number" :disabled="!settings.smooth">
+        </label>
+        <label>
+          Mitigation
+          <input v-model="settings.rotationMitigation" type="number" :disabled="!settings.smooth">
+        </label>
+        <h3>Debug</h3>
+        <label>
+          <input v-model="settings.debug.dataInspector" type="checkbox">
+          Data inspector
+        </label>
+      </div>
+      <div class="data-inspector" v-if="settings.debug.dataInspector">
+        <p>Mouse X: {{ mousePos.x }}</p>
+        <p>Mouse Y: {{ mousePos.y }}</p>
+        <p>Dragged card index: {{ draggedCardIdx }}</p>
+        <p>Pane overlapped index: {{ paneOverlappedIdx }}</p>
+        <p>Ghost card X: {{ ghostCardStyle.pos.x }}</p>
+        <p>Ghost card Y: {{ ghostCardStyle.pos.y }}</p>
+        <p>Mouse distance from middle: {{ ghostCardStyle.percentDistanceMiddle * 100 }}%</p>
+        <p>Ghost card rotation: {{ Math.round(ghostCardStyle.rotation * 100) / 100 }}</p>
+        <p>Motion velocity: {{ ghostCardStyle.velocity }}</p>
+      </div>
+    </div>
+    <!-- -->
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js"
+    ></script>
+    <script type="text/javascript" src="./index.js"></script>
+  </body>
+</html>
