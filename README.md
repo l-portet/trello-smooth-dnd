@@ -1,5 +1,6 @@
 # trello-smooth-dnd
 Trello smooth drag and drop
+> The structure of this project only remains on 3 main files (`index.html`, `index.js` and `main.scss`) because it was basically a pen developped on Codepen. It's not meant to be an independent or reusable package.
 
 Here's a [live demo](https://codepen.io/l-portet/full/jObbRYJ).
 
